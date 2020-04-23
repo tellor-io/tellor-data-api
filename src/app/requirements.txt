@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Script
+Flask-HTTPAuth
+SQLAlchemy-serializer
+psycopg2
+web3
+eth_abi
+eth-utils

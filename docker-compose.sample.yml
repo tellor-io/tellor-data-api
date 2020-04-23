@@ -1,0 +1,50 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.6
+    environment:
+        - POSTGRES_USER=tellor
+        - POSTGRES_PASSWORD=tellor
+        - POSTGRES_DB=tellor
+    ports:
+      - "5432:5432"
+    logging:
+        options:
+            max-size: 10m
+            max-file: "3"
+
+  webserver:
+    restart: always
+    environment:
+      FLASK_APP: main.py
+      FLASK_ENV: "development"
+      BLOCK_RANGE_MAX: 1000 # blocks
+      WEB3_PROVIDER_URI: "https://mainnet.infura.io/v3/xxx"
+      BACKEND_USERNAME: tellor
+      BACKEND_PASSWORD: tellor
+      POSTGRES_USER: tellor
+      POSTGRES_PASSWORD: tellor
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: tellor
+    build: ./src
+    links:
+      - postgres
+    ports:
+      - "3000:80"
+    volumes:
+      - ./src/app:/app
+
+  node:
+    image: "node:8"
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      NODE_ENV: development
+      POLL_INTERVAL: 10 # seconds
+      BACKEND_USERNAME: tellor
+      BACKEND_PASSWORD: tellor
+      API_UPDATE_URL: http://webserver/update
+    volumes:
+      - ./cron:/home/node/app
+    command: "npm start"
